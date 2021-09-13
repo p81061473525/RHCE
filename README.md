@@ -24,15 +24,12 @@ RHCE
 
 ### RH134 
 
-### RH124 
 #### CH01 Getting Started with Red Hat Enterprise Linux
 #### CH02 Accessing the Command Line
 #### CH03 Managing Files From the Command Line
 #### CH04 Getting Help in Red Hat Enterprise Linux
 #### CH05 Creating , Viewing and Editing Text Files
 #### CH06 Managing Local Users and Groups
-##### su sudo
-##### 建議多練習附屬群組 p.181 多做。
 #### CH07 Controlling Access to Files
 #### CH08 Monitoring and Managing Linux Processes
 #### CH09 Controlling Services and Deamons
