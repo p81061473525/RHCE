@@ -1,0 +1,39 @@
+# 0915 practice 紀錄
+
+```
+[root@localhost ~]#  less /var/log/maillog
+[root@localhost ~]#  less /var/log/boot.log
+/var/log/boot.log: No such file or directory
+[root@localhost ~]#  less /var/log/secure
+[root@localhost ~]#  vim /etc/rsyslog.conf
+這個是 rsyslog.d 設定檔案
+
+[root@localhost ~]# man logrotate # 本課程不教如何配置，只是有敘述紀錄時間
+
+[root@localhost ~]# logger -p local7.notice "123123123"4 # 這是用來記錄 history 中斷點所使用的。（等於是發訊息到系統至日中，好用來排除錯誤。
+
+[root@localhost ~]# journalctl # 實戰中常用到
+Sep 15 13:37:05 localhost.localdomain kernel: RAMDISK: [mem 0x1e53a000-0x1f10efff]
+Sep 15 13:37:05 localhost.localdomain kernel: Early table checksum verification disabled
+Sep 15 13:37:05 localhost.localdomain kernel: ACPI: RSDP 00000000000e0000 00024 (v02 VBOX  )
+Sep 15 13:37:05 localhost.localdomain kernel: ACPI: XSDT 000000001fff0030 0003C (v01 VBOX   VBOXXSDT 00000001 ASL  00000061)
+Sep 15 13:37:05 localhost.localdomain kernel: ACPI: FACP 000000001fff00f0 000F4 (v04 VBOX   VBOXFACP 00000001 ASL  00000061)
+
+[root@localhost ~]# journalctl -p err
+-- Logs begin at Wed 2021-09-15 13:37:05 UTC, end at Wed 2021-09-15 13:47:32 UTC. --
+Sep 15 13:37:07 localhost.localdomain systemd[266]: Failed at step STDIN spawning /usr/libexec/selinux/selinux-policy-migrate-local-changes.sh: In
+Sep 15 13:37:07 localhost.localdomain systemd[1]: Failed to start Migrate local SELinux policy changes from the old store structure to the new str
+Sep 15 13:37:11 localhost.localdomain kernel: snd_intel8x0 0000:00:05.0: measure - unreliable DMA position..
+Sep 15 13:37:11 localhost.localdomain systemd[1]: Failed to start LSB: Bring up/down networking.
+Sep 15 13:37:11 localhost.localdomain kernel: snd_intel8x0 0000:00:05.0: measure - unreliable DMA position..
+Sep 15 13:37:12 localhost.localdomain kernel: snd_intel8x0 0000:00:05.0: measure - unreliable DMA position..
+
+[root@localhost ~]# journalctl --since today
+Sep 15 13:37:05 localhost.localdomain kernel: ACPI: RSDP 00000000000e0000 00024 (v02 VBOX  )
+Sep 15 13:37:05 localhost.localdomain kernel: ACPI: XSDT 000000001fff0030 0003C (v01 VBOX   VBOXXSDT 00000001 ASL  00000061)
+Sep 15 13:37:05 localhost.localdomain kernel: ACPI: FACP 000000001fff00f0 000F4 (v04 VBOX   VBOXFACP 00000001 ASL  00000061)
+
+[root@localhost ~]# journalctl --since today until ...
+Failed to add match 'until': Invalid argument
+Failed to add filters: Invalid argument
+```
