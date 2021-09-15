@@ -1,6 +1,9 @@
 # 0915 practice 紀錄
 
 ```
+
+rsyslog 與 journald 兩種 LOG 介紹
+
 [root@localhost ~]#  less /var/log/maillog
 [root@localhost ~]#  less /var/log/boot.log
 /var/log/boot.log: No such file or directory
@@ -36,4 +39,221 @@ Sep 15 13:37:05 localhost.localdomain kernel: ACPI: FACP 000000001fff00f0 000F4 
 [root@localhost ~]# journalctl --since today until ...
 Failed to add match 'until': Invalid argument
 Failed to add filters: Invalid argument
+
+[root@localhost ~]# journalctl --since 13:37  --until 14:05
+-- Logs begin at Wed 2021-09-15 13:37:05 UTC, end at Wed 2021-09-15 13:51:34 UTC. --
+Sep 15 13:37:05 localhost.localdomain systemd-journal[91]: Runtime journal is using 4.0M (max allowed 24.3M, trying to leave 36.5M free of 239.4M
+Sep 15 13:37:05 localhost.localdomain kernel: Initializing cgroup subsys cpuset
+Sep 15 13:37:05 localhost.localdomain kernel: Initializing cgroup subsys cpu
+Sep 15 13:37:05 localhost.localdomain kernel: Initializing cgroup subsys cpuacct
+Sep 15 13:37:05 localhost.localdomain kernel: Linux version 3.10.0-1127.el7.x86_64 (mockbui
+
+[root@localhost ~]# journalctl --since 13:37  --until 14:05 --unit sshd
+-- Logs begin at Wed 2021-09-15 13:37:05 UTC, end at Wed 2021-09-15 14:01:01 UTC. --
+Sep 15 13:37:11 localhost.localdomain systemd[1]: Starting OpenSSH server daemon...
+Sep 15 13:37:11 localhost.localdomain sshd[613]: Server listening on 0.0.0.0 port 22.
+Sep 15 13:37:11 localhost.localdomain sshd[613]: Server listening on :: port 22.
+Sep 15 13:37:11 localhost.localdomain systemd[1]: Started OpenSSH server daemon.
+Sep 15 13:37:16 localhost.localdomain sshd[923]: Accepted publickey for vagrant from 10.0.2.2 port 64660 ssh2: RSA SHA256:1M4RzhMyWuFS/86uPY/ce2pr
+Sep 15 13:36:40 localhost.localdomain sshd[1555]: Accepted publickey for vagrant from 10.0.2.2 port 64661 ssh2: RSA SHA256:A4QF0Si7JJOoDk3izFt5RZr
+Sep 15 13:36:44 localhost.localdomain sshd[2464]: Accepted publickey for vagrant from 10.0.2.2 port 64662 ssh2: RSA SHA256:A4QF0Si7JJOoDk3izFt5RZr
+Sep 15 13:36:55 localhost.localdomain sshd[2745]: Accepted publickey for vagrant from 10.0.2.2 port 64663 ssh2: RSA SHA256:A4QF0Si7JJOoD
+
+[root@localhost ~]# timedatectl
+      Local time: Wed 2021-09-15 14:06:12 UTC
+  Universal time: Wed 2021-09-15 14:06:12 UTC
+        RTC time: Wed 2021-09-15 14:06:50
+       Time zone: UTC (UTC, +0000)
+     NTP enabled: yes
+NTP synchronized: yes
+ RTC in local TZ: no
+      DST active: n/a
+
+[root@localhost ~]# timedatectl list-timezones
+Africa/Abidjan
+Africa/Accra
+Africa/Addis_Ababa
+Africa/Algiers
+Africa/Asmara
+Africa/Bamako
+Africa/Bangui
+Africa/Banjul
+Africa/Bissau
+Africa/Blantyre
+Africa/Brazzaville
+Africa/Bujumbura
+Africa/Cairo
+Africa/Casablanca
+Africa/Ceuta
+
+[root@localhost ~]# timedatectl set-timezone Asia/
+Failed to set time zone: Invalid time zone 'Asia/'
+[root@localhost ~]# timedatectl list-timezones | grep Taipei
+Asia/Taipei
+[root@localhost ~]# timedatectl set-timezone $(!!)
+timedatectl set-timezone $(timedatectl list-timezones | grep Taipei)
+[root@localhost ~]# timedatectl set-timezone $(timedatectl list-timezones | grep Taipei)
+timedatectl set-timezone $(timedatectl list-timezones | grep Taipei)
+
+[root@localhost ~]# timedate
+timedate
+-bash: timedate: command not found
+[root@localhost ~]# timedatectl
+      Local time: Wed 2021-09-15 22:07:35 CST
+  Universal time: Wed 2021-09-15 14:07:35 UTC
+        RTC time: Wed 2021-09-15 14:08:13
+       Time zone: Asia/Taipei (CST, +0800)
+     NTP enabled: yes
+NTP synchronized: yes
+ RTC in local TZ: no
+      DST active: n/a
+
+[root@localhost ~]# vim /etc/chrony.conf
+[root@localhost ~]# cat .
+cat: .: Is a directory
+[root@localhost ~]# cat /etc/chrony.conf
+# Use public servers from the pool.ntp.org project.
+# Please consider joining the pool (http://www.pool.ntp.org/join.html).
+server 0.centos.pool.ntp.org iburst
+server 1.centos.pool.ntp.org iburst
+server 2.centos.pool.ntp.org iburst
+server 3.centos.pool.ntp.org iburst
+
+# Record the rate at which the system clock gains/losses time.
+driftfile /var/lib/chrony/drift
+
+# Allow the system clock to be stepped in the first three updates
+# if its offset is larger than 1 second.
+makestep 1.0 3
+
+# Enable kernel synchronization of the real-time clock (RTC).
+rtcsync
+
+# Enable hardware timestamping on all interfaces that support it.
+#hwtimestamp *
+
+# Increase the minimum number of selectable sources required to adjust
+# the system clock.
+#minsources 2
+
+# Allow NTP client access from local network.
+#allow 192.168.0.0/16
+
+# Serve time even if not synchronized to a time source.
+#local stratum 10
+
+# Specify file containing keys for NTP authentication.
+#keyfile /etc/chrony.keys
+
+# Specify directory for log files.
+logdir /var/log/chrony
+
+# Select which information is logged.
+#log measurements statistics tracking
+
+https://dywang.csie.cyut.edu.tw/dywang/rhel7/node70.html
+iburst 選項是用來加速初始同步
+
+https://www.stdtime.gov.tw/chinese/bulletin/NTP%20promo.txt 中華 NTP
+
+[root@localhost ~]# chronyc sources -v
+210 Number of sources = 4
+
+  .-- Source mode  '^' = server, '=' = peer, '#' = local clock.
+ / .- Source state '*' = current synced, '+' = combined , '-' = not combined,
+| /   '?' = unreachable, 'x' = time may be in error, '~' = time too variable.
+||                                                 .- xxxx [ yyyy ] +/- zzzz
+||      Reachability register (octal) -.           |  xxxx = adjusted offset,
+||      Log2(Polling interval) --.      |          |  yyyy = measured offset,
+||                                \     |          |  zzzz = estimated error.
+||                                 |    |           \
+MS Name/IP address         Stratum Poll Reach LastRx Last sample
+===============================================================================
+^- time.cloudflare.com           3   8   377   168    +13ms[  +12ms] +/-   77ms
+^- time.cloudflare.com           3   8   377   226    +14ms[  +14ms] +/-   76ms
+^+ b341.cxs.pw                   2   8   377   166  +1091us[ +735us] +/-   38ms
+^* 103.147.23.5                  2   8   377   162  -1976us[-2332us] +/-   22ms
+
+[root@localhost ~]# vim /etc/chrony.conf
+  7 server tock.stdtime.gov.tw iburst
+  
+root@localhost ~]# systemctl restart chronyd
+[root@localhost ~]# chronyc sources -v
+210 Number of sources = 4
+
+  .-- Source mode  '^' = server, '=' = peer, '#' = local clock.
+ / .- Source state '*' = current synced, '+' = combined , '-' = not combined,
+| /   '?' = unreachable, 'x' = time may be in error, '~' = time too variable.
+||                                                 .- xxxx [ yyyy ] +/- zzzz
+||      Reachability register (octal) -.           |  xxxx = adjusted offset,
+||      Log2(Polling interval) --.      |          |  yyyy = measured offset,
+||                                \     |          |  zzzz = estimated error.
+||                                 |    |           \
+MS Name/IP address         Stratum Poll Reach LastRx Last sample
+===============================================================================
+^? b341.cxs.pw                   2   6     3     1  -1868us[-1868us] +/-   29ms
+^? b335.cxs.pw                   2   6     3     1  +1382us[+1382us] +/-   31ms
+^? ntp.tipsy.coffee              2   6     3     2  +8087us[+8087us] +/-   15ms
+^? 0.co.ntp.edgeuno.com          2   6     3     1    +34us[  +34us] +/-  206ms.   <----變囉！
+
+[root@localhost ~]# chronyc sources -v
+210 Number of sources = 4
+
+  .-- Source mode  '^' = server, '=' = peer, '#' = local clock.
+ / .- Source state '*' = current synced, '+' = combined , '-' = not combined,
+| /   '?' = unreachable, 'x' = time may be in error, '~' = time too variable.
+||                                                 .- xxxx [ yyyy ] +/- zzzz
+||      Reachability register (octal) -.           |  xxxx = adjusted offset,
+||      Log2(Polling interval) --.      |          |  yyyy = measured offset,
+||                                \     |          |  zzzz = estimated error.
+||                                 |    |           \
+MS Name/IP address         Stratum Poll Reach LastRx Last sample
+===============================================================================
+^? t2.time.tw1.yahoo.com         0   6     0     -     +0ns[   +0ns] +/-    0ns
+^- b335.cxs.pw                   2   6    17    30  -7354us[-7354us] +/-   32ms
+^* ntp.tipsy.coffee              2   6    17    31   -946us[-1946us] +/-   16ms
+^- 0.co.ntp.edgeuno.com          2   6    17    29  +4864us[+4864us] +/-  197ms
+
+後來因為一直變動，將 /etc/chrony.conf centos 預設的源刪除，減少干擾
+  1 # Use public servers from the pool.ntp.org project.
+  2 # Please consider joining the pool (http://www.pool.ntp.org/join.html).
+  3 # server 0.centos.pool.ntp.org iburst
+  4 # server 1.centos.pool.ntp.org iburst
+  5 # server 2.centos.pool.ntp.org iburst
+  6 # server 3.centos.pool.ntp.org iburst
+  7 server tock.stdtime.gov.tw iburst
+  
+[root@localhost ~]# systemctl restart chronyd
+[root@localhost ~]# chronyc sources -v
+210 Number of sources = 1
+
+  .-- Source mode  '^' = server, '=' = peer, '#' = local clock.
+ / .- Source state '*' = current synced, '+' = combined , '-' = not combined,
+| /   '?' = unreachable, 'x' = time may be in error, '~' = time too variable.
+||                                                 .- xxxx [ yyyy ] +/- zzzz
+||      Reachability register (octal) -.           |  xxxx = adjusted offset,
+||      Log2(Polling interval) --.      |          |  yyyy = measured offset,
+||                                \     |          |  zzzz = estimated error.
+||                                 |    |           \
+MS Name/IP address         Stratum Poll Reach LastRx Last sample
+===============================================================================
+^* 211-22-103-157.hinet-ip.>     2   6    37    40  +8149ns[+4482us] +/-   51ms
+
+現在只去找中華了
+
 ```
+
+# 今日練習項目
+- rsyslog 
+-- /etc/rsyslog.conf 
+- jounerctl 
+-- jounerctl --unit --since --today
+- chronyd
+-- iburst 加速
+-- chronyc sources -v 
+-- chronyc --help 哭啊，竟然沒有 source 用法
+-- /etc/chrony.conf 修改 ntp server 源
+-- chronyc sources -v 同步確認．
+
+[root@localhost ~]# chronyc --help
+Usage: chronyc [-h HOST] [-p PORT] [-n] [-c] [-d] [-4|-6] [-m] [COMMAND]
