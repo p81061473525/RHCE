@@ -1,0 +1,5 @@
+幹!!! 課本根本是個垃圾，根本不教怎麼設訂，只教怎麼掛載 mount -t nfs -o rw serverb:/share/folider  mountpoint 
+
+不如參考(以下內容待審)
+http://linux.vbird.org/linux_server/0330nfs.php
+https://www.youtube.com/watch?v=B7ihvl1su3A
